@@ -3,11 +3,14 @@
 import axios from 'axios';
 import inquirer from 'inquirer';
 import { v4 as uuidv4 } from 'uuid';
+import { promises as fs } from 'fs';
+import { QRCodeErrorCorrectionLevel } from 'qrcode';
 import * as api from './api';
 
 import constants from './constants';
 import decryptTokens from './decrypt';
 import getOtps from './otp';
+import { exportCSV, exportJSON, exportQR } from './utils';
 
 // Inject axios defaults
 axios.defaults.baseURL = constants.API_BASE_URL;
@@ -112,7 +115,66 @@ async function run() {
 
     const decryptedTokens = decryptTokens(tokens, password);
 
-    console.log(decryptedTokens);
+    const { formats } = await inquirer.prompt<{ formats: string[] }>([
+      {
+        type: 'checkbox',
+        message: 'Export formats',
+        name: 'formats',
+        choices: [
+          { name: 'CSV', value: 'csv' },
+          { name: 'JSON', value: 'json' },
+          { name: 'QR codes', value: 'qr' },
+        ],
+        validate: (value) => value.length > 0 || 'You must choose at least one export format',
+      },
+    ]);
+
+    const { output } = await inquirer.prompt<{ output: string }>([
+      {
+        type: 'input',
+        message: 'Output directory path',
+        name: 'output',
+        validate: (value) => value.length > 0 || 'You must enter output directory path',
+      },
+    ]);
+
+    // Check if output directory is empty or create if does not exist
+    try {
+      const outputFiles = await fs.readdir(output);
+      if (outputFiles.length > 0) throw new Error('Output directory is not empty');
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        await fs.mkdir(output, { recursive: true });
+      } else {
+        throw err;
+      }
+    }
+
+    if (formats.includes('csv')) {
+      await exportCSV(decryptedTokens, output);
+    }
+
+    if (formats.includes('json')) {
+      await exportJSON(decryptedTokens, output);
+    }
+
+    if (formats.includes('qr')) {
+      const { correction } = await inquirer.prompt<{ correction: QRCodeErrorCorrectionLevel }>([
+        {
+          type: 'list',
+          message: 'QR code error correction level',
+          name: 'correction',
+          choices: [
+            { name: 'L (low, ~7%)', key: 'L' },
+            { name: 'M (medium, ~15%)', key: 'M' },
+            { name: 'Q (quartile, ~25%', key: 'Q' },
+            { name: 'H (high, ~30%)', key: 'H' },
+          ],
+        },
+      ]);
+
+      await exportQR(decryptedTokens, output, correction);
+    }
   } catch (err) {
     console.error(err.message);
   }

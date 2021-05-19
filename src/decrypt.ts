@@ -65,7 +65,7 @@ function decryptAES(
   return decryptAESWithKey(pbkdf2Key, value);
 }
 
-interface DecryptedToken extends AuthenticatorTokenDTO {
+export interface DecryptedToken extends AuthenticatorTokenDTO {
   decrypted_seed: string;
 }
 
