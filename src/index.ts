@@ -61,8 +61,8 @@ async function run() {
         message: 'Authentication method',
         choices: [
           { name: 'SMS', value: 'sms' },
-          { name: 'Call', value: 'call' },
-          { name: 'Other device', value: 'push' },
+          { name: 'Call', value: 'call', disabled: 'Currently unsupported' },
+          { name: 'Other device', value: 'push', disabled: 'Currently unsupported' },
         ],
       },
     ]);
