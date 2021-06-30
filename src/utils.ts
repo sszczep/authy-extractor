@@ -28,7 +28,7 @@ export async function exportCSV(tokens: DecryptedToken[], output: string) {
       // https://stackoverflow.com/a/4617967
       const fields = [name, issuer, decrypted_seed, uri].map((field) => {
         if (field === null) return '""';
-        return `"${field.toString().replaceAll('"', '""')}"`;
+        return `"${field.toString().replace(new RegExp('"', 'g'), '""')}"`;
       });
 
       return fields.join(',');
