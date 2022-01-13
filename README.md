@@ -5,6 +5,9 @@
 ![github issues](https://img.shields.io/github/issues/sszczep/authy-extractor?style=for-the-badge)
 ![github stars](https://img.shields.io/github/stars/sszczep/authy-extractor?style=for-the-badge)
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/sszczep)
+
+
 ![gif](https://user-images.githubusercontent.com/21238816/123828548-e4197380-d901-11eb-96f0-6eda8556972d.gif)
 
 Fast and easy way to backup 2FA tokens from Authy.
